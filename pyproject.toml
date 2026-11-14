@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hmr2"
+version = "0.1.0"
+description = "HMR2 as a package"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Shubham Goel"},
+    {name = "Georgios Pavlakos"},
+    {name = "Jathushan Rajasegaran"},
+    {name = "Angjoo Kanazawa"},
+    {name = "Jitendra Malik"},
+]
+keywords = ["human pose estimation", "3D reconstruction", "tracking", "transformers", "SMPL"]
+
+dependencies = [
+    "gdown",
+    "numpy",
+    "torch",
+    "torchvision",
+    "pytorch-lightning",
+    # omegaconf is needed to allowlist DictConfig/ListConfig for PyTorch 2.6+ checkpoint loading
+    "omegaconf",
+    "smplx==0.1.28",
+    "pyrender",
+    "opencv-python",
+    "yacs",
+    "scikit-image",
+    "einops",
+    "timm",
+    "webdataset",
+    "dill",
+    "pandas",
+    "chumpy @ git+https://github.com/mattloper/chumpy",
+]
+
+[project.optional-dependencies]
+all = [
+    "detectron2 @ git+https://github.com/facebookresearch/detectron2",
+]
+training = [
+    "rich",
+    "hydra-core",
+    "hydra-submitit-launcher",
+    "hydra-colorlog",
+    "pyrootutils",
+]
+tracking = [
+    "phalp @ git+https://github.com/brjathu/PHALP.git",
+    # Override PHALP's neural-renderer-pytorch with PyTorch 2.x compatible fork
+    "neural-renderer-pytorch @ git+https://github.com/Delaunay/NMR.git@fixes",
+]
+dev = [
+    "hmr2[all,training,tracking]",
+]
+
+[project.urls]
+Homepage = "https://shubham-goel.github.io/4dhumans/"
+Repository = "https://github.com/shubham-goel/4D-Humans"
+Paper = "https://arxiv.org/pdf/2305.20091.pdf"
+
+[tool.uv.extra-build-dependencies]
+chumpy = ["pip"]
+detectron2 = ["torch"]
+neural-renderer-pytorch = ["torch"]
+
+# PyTorch CUDA 12.4 - matches system CUDA for detectron2 compilation
+# Note: GTX 1080 Ti (sm_61) may show warnings but should work at runtime
+# See: https://docs.astral.sh/uv/guides/integration/pytorch/
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu124", marker = "sys_platform == 'linux'" },
+]
+torchvision = [
+    { index = "pytorch-cu124", marker = "sys_platform == 'linux'" },
+]
+neural-renderer-pytorch = { git = "https://github.com/Delaunay/NMR.git", branch = "fixes" }
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hmr2*"]

@@ -81,5 +81,6 @@ def load_hmr2(checkpoint_path=DEFAULT_CHECKPOINT):
     # Ensure SMPL model exists
     check_smpl_exists()
 
-    model = HMR2.load_from_checkpoint(checkpoint_path, strict=False, cfg=model_cfg)
+    # weights_only=False needed for PyTorch 2.6+ (checkpoint contains OmegaConf objects)
+    model = HMR2.load_from_checkpoint(checkpoint_path, strict=False, cfg=model_cfg, weights_only=False)
     return model, model_cfg
